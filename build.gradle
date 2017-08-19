@@ -25,11 +25,11 @@ def scalaCompilerOptions = [
 compileScala.scalaCompileOptions.additionalParameters = scalaCompilerOptions
 
 String buildPath(Set<File> files) {
-	if (files.size() < 0)
+	if (files.size() <= 0)
 		return ""
 
-	def res = files.head().toString()
-	files.tail().each { res += ":${it.toString()}" }
+	def res = ""
+	files.each { res += ":${it.toString()}" }
 	return res
 }
 
