@@ -1,0 +1,48 @@
+apply plugin: 'scala'
+apply plugin: 'eclipse'
+
+version = '0.0.1'
+
+configurations { scalaCompiler }
+
+configurations.scalaCompiler.transitive = false
+
+repositories { jcenter() }
+
+dependencies {
+	compile 'org.scala-lang:scala-library:2.12.2'
+	compile 'org.scala-lang:scala-reflect:2.12.2'
+
+	scalaCompiler 'org.scalamacros:paradise_2.12.2:2.1.1'
+}
+
+def pluginPath = buildPath(configurations.scalaCompiler.files)
+def scalaCompilerOptions = [
+	"-Xplugin:$pluginPath".toString(),
+	"-feature",
+	"-deprecation"
+]
+compileScala.scalaCompileOptions.additionalParameters = scalaCompilerOptions
+
+String buildPath(Set<File> files) {
+	if (files.size() < 0)
+		return ""
+
+	def res = files.head().toString()
+	files.tail().each { res += ":${it.toString()}" }
+	return res
+}
+
+task eclipseSdt {
+	doLast {
+		def props = new Properties()
+		def loc = new File(project.projectDir, ".settings/org.scala-ide.sdt.core.prefs")
+		if (loc.exists())
+			props.load(new FileInputStream(loc))
+		props.setProperty("Xplugin", pluginPath)
+		props.setProperty("scala.compiler.useProjectSettings", "true")
+		props.store(new FileOutputStream(loc), null)
+	}
+}
+
+tasks['eclipse'].dependsOn eclipseSdt
