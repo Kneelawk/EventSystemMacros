@@ -12,6 +12,9 @@ class EventSystem extends StaticAnnotation {
 
 private object EventSystemMacro {
   def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
+    import c.universe._
+
+    val classes = annottees.map(_.tree).toList
     null
   }
 }
